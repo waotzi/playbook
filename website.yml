@@ -18,10 +18,8 @@
 
     - name: Update the repository if it exists
       git:
-        repo: /var/www/waotzi.org
+        repo: https://github.com/waotzi/website.git
         dest: /var/www/waotzi.org
-        remote: origin
-        refspec: "+refs/heads/master:refs/remotes/origin/master"
         update: yes
       register: git_pull
       when: dir_check.stat.exists
