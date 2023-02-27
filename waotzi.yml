@@ -1,0 +1,32 @@
+---
+- name: Update and build waotzi
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Check if the directory exists
+      stat:
+        path: /var/www/waotzi
+      register: dir_check
+
+    - name: Clone the repository if it doesn't exist
+      git:
+        repo: https://github.com/waotzi/website.git
+        dest: /var/www/waotzi
+        version: main
+      when: not dir_check.stat.exists
+
+    - name: Update the repository if it exists
+      git:
+        repo: /var/www/waotzi
+        dest: /var/www/waotzi
+        remote: origin
+        refspec: "+refs/heads/main:refs/remotes/origin/main"
+        update: yes
+      when: dir_check.stat.exists
+
+    - name: Build waotzi
+      command: lua build.lua
+      args:
+        chdir: ~/var/waotzi
+      when: git_pull.changed or not dir_check.stat.exists
