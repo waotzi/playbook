@@ -13,7 +13,7 @@
       git:
         repo: https://github.com/waotzi/website.git
         dest: /var/www/waotzi
-        version: main
+        version: master
       when: not dir_check.stat.exists
 
     - name: Update the repository if it exists
@@ -21,12 +21,13 @@
         repo: /var/www/waotzi
         dest: /var/www/waotzi
         remote: origin
-        refspec: "+refs/heads/main:refs/remotes/origin/main"
+        refspec: "+refs/heads/master:refs/remotes/origin/master"
         update: yes
+      register: git_pull
       when: dir_check.stat.exists
 
     - name: Build waotzi
       command: lua build.lua
       args:
-        chdir: ~/var/waotzi
+        chdir: ~/var/www/waotzi
       when: git_pull.changed or not dir_check.stat.exists
