@@ -29,5 +29,5 @@
     - name: Build waotzi
       command: lua build.lua
       args:
-        chdir: ~/var/www/waotzi
+        chdir: /var/www/waotzi
       when: git_pull.changed or not dir_check.stat.exists
