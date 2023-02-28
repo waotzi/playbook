@@ -24,15 +24,12 @@
         chdir: /var/www/ukuvota.world
       when: git_pull.changed
 
-    - name: Delete the existing build directory
-      file:
-        path: /var/www/ukuvota.world/build
-        state: absent
-      when: git_pull.changed and ansible_facts['file_exists']|default(False)|bool
-
-    - name: Move built files to deployment directory
-      command: mv /var/www/ukuvota.world/dist /var/www/ukuvota.world/build
-      when: git_pull.changed
+    - name: Sync dist directory with build directory
+      synchronize:
+        src: /var/www/ukuvota.world/dist/
+        dest: /var/www/ukuvota.world/build/
+        delete: true
+      when: git_pull.changed 
 
     - name: Restart the application
       command: pm2 restart 0
