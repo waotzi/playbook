@@ -19,11 +19,9 @@
       when: git_pull.changed
 
     - name: Build the application
-      npm:
-        path: /var/www/ukuvota.world
-        state: present
-        name: run
-        args: build
+      command: npm run build
+      args:
+        chdir: /var/www/ukuvota.world
       when: git_pull.changed
 
     - name: Delete the existing build directory
