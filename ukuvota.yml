@@ -12,9 +12,17 @@
         force: yes
       register: git_pull
 
-    - name: Install packages
-      command: npm install
-      args:
-        chdir: /var/www/ukuvota.world
+    - name: Install packages and build
+      npm:
+        path: /var/www/ukuvota.world
+        state: present
+        global: no
       when: git_pull.changed
-    
+
+    - name: Move built files to deployment directory
+      command: mv /var/www/ukuvota.world/dist /var/www/ukuvota.world/deploy
+      when: git_pull.changed
+
+    - name: Restart the application
+      command: pm2 restart 0
+      when: git_pull.changed
