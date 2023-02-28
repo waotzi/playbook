@@ -9,7 +9,6 @@
         repo: https://github.com/waotzi/ukuvota.git
         dest: /var/www/ukuvota.world
         update: yes
-        force: no
       register: git_pull
 
     - name: Install packages

@@ -3,8 +3,6 @@
   pass-arguments-to-command:
     - source: payload
       name: repository.name
-    - source: paload
-      name: repository.branch
   trigger-rule:
     and:
       - match:
