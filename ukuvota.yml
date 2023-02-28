@@ -12,11 +12,19 @@
         force: yes
       register: git_pull
 
-    - name: Install packages and build
+    - name: Install packages
       npm:
         path: /var/www/ukuvota.world
         state: present
         global: no
+      when: git_pull.changed
+
+    - name: Build the application
+      npm:
+        path: /var/www/ukuvota.world
+        state: present
+        name: run
+        args: build
       when: git_pull.changed
 
     - name: Delete the existing build directory
