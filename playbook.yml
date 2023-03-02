@@ -1,0 +1,25 @@
+---
+- name: Update playbooks
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Check if the directory exists
+      stat:
+        path: /root/playbook
+      register: dir_check
+
+    - name: Clone the repository if it doesn't exist
+      git:
+        repo: https://github.com/waotzi/playbook.git
+        dest: /root/playbook
+        version: master
+      when: not dir_check.stat.exists
+
+    - name: Update the repository if it exists
+      git:
+        repo: https://github.com/waotzi/playbook.git
+        dest: /root/playbook
+        update: yes
+      register: git_pull
+      when: dir_check.stat.exists
