@@ -5,7 +5,7 @@
   vars:
     github_user: "waotzi"
     github_repo: "ukuvota"
-    backup_dir: "/root/backups/ukuvota"
+    backup_dir: "/root/backup/ukuvota"
     backup_filename: "db_backup_{{ ansible_date_time.iso8601_basic }}.zip"
 
   tasks:
