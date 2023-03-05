@@ -32,6 +32,7 @@
         dest: /var/www/ukuvota.world
         remote_src: yes
         extra_opts: [--overwrite]
+        force: true
       when: db_backup.rc == 0
 
     - name: Restart the application
