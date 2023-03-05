@@ -25,14 +25,21 @@
       shell: "cd /var/www/ukuvota.world && zip -r {{ backup_dir }}/{{ backup_filename }} db"
       register: db_backup
       when: backup_dir is defined
-
-    - name: Remove /dist folder
+    
+    - name: Remove dist folder if present
       file:
         path: /var/www/ukuvota.world/dist
         state: absent
-      become: yes
+      become: true
       when: db_backup.rc == 0
-      
+
+    - name: Create dist directory if not present
+      file:
+        path: /var/www/ukuvota.world/dist
+        state: directory
+      become: true
+      when: db_backup.rc == 0
+
     - name: Unzip artifact to /var/www/ukuvota.world/dist
       unarchive:
         src: /tmp/ukuvota.zip
