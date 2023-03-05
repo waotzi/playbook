@@ -7,8 +7,7 @@
     github_user: "waotzi"
     github_repo: "ukuvota"
     backup_dir: "/root/backups/ukuvota"
-    current_datetime: "{{ ansible_date_time.iso8601_basic }}"
-    backup_filename: "db_backup_{{ current_datetime }}.zip"
+    backup_filename: "db_backup_{{ ansible_date_time.iso8601_basic }}.zip"
 
   tasks:
     - name: Get Artifact ID
@@ -17,6 +16,7 @@
 
     - name: Get Archive Download URL
       shell: curl -L "https://api.github.com/repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }}/zip" -o /tmp/ukuvota.zip
+      register: archive_url
 
     - name: Backup database
       shell: "cd /var/www/ukuvota.world && zip -r {{ backup_dir }}/{{ backup_filename }} db"
