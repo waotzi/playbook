@@ -35,14 +35,22 @@
       copy: 
         src: ./webhook.conf
         dest: "{{ webhook_conf_path }}"
-      when: git_pull.changed == True
+      when: git_pull.changed
 
     - name: Get the value of WEBHOOK_SECRET environment variable from the .env file
-      shell: "cat /path/to/.env | grep 'WEBHOOK_SECRET' | cut -d '=' -f 2"
+      shell: "cat {{ env_file_path }} | grep 'WEBHOOK_SECRET' | cut -d '=' -f 2"
       register: webhook_secret
+      when: git_pull.changed
 
     - name: Update the webhook configuration with new secret
       replace:
         path: "{{ webhook_conf_path }}"
         regexp: 'X-Hub-Signature:\s(.*)$'
         replace: 'X-Hub-Signature: {{ webhook_secret.stdout }}'
+      when: git_pull.changed
+      
+    - name: Restart WebHook
+      systemd:
+        name: webhook
+        state: restarted
+      when: git_pull.changed
