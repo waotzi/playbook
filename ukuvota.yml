@@ -40,12 +40,8 @@
       become: true
       when: db_backup.rc == 0
 
-    - name: Unzip artifact to /var/www/ukuvota.world/dist
-      unarchive:
-        src: /tmp/ukuvota.zip
-        dest: /var/www/ukuvota.world/dist
-        remote_src: yes
-        extra_opts: [--overwrite]
+    - name: Extract artifact
+      shell: "unzip -o /tmp/ukuvota.zip -d /var/www/ukuvota.world/dist"
       when: db_backup.rc == 0
 
     - name: Restart the application
