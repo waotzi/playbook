@@ -29,28 +29,29 @@
         repo: https://github.com/waotzi/playbook.git
         dest: /root/playbook
         update: yes
-      register: git_pull
+      register: git_updated
 
     - name: Replace the Webhook Configuration file with new configuration file
       copy: 
         src: ./webhook.conf
         dest: "{{ webhook_conf_path }}"
-      when: git_pull.changed
+      when: git_updated.changed == True
 
     - name: Get the value of WEBHOOK_SECRET environment variable from the .env file
       shell: "cat {{ env_file_path }} | grep 'WEBHOOK_SECRET' | cut -d '=' -f 2"
       register: webhook_secret
-      when: git_pull.changed
+      when: git_updated.changed == True
 
     - name: Update the webhook configuration with new secret
       replace:
         path: "{{ webhook_conf_path }}"
         regexp: 'X-Hub-Signature:\s(.*)$'
         replace: 'X-Hub-Signature: {{ webhook_secret.stdout }}'
-      when: git_pull.changed
-      
+      when: git_updated.changed == True
+
     - name: Restart WebHook
       systemd:
-        name: webhook
+        name: webhook.service
         state: restarted
-      when: git_pull.changed
+      when: git_updated.changed == True
+  
