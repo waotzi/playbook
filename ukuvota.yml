@@ -4,6 +4,8 @@
   gather_facts: false
 
   vars:
+    github_user: "waotzi"
+    github_repo: "ukuvota"
     backup_dir: "/root/backups/ukuvota"
     current_datetime: "{{ ansible_date_time.iso8601_basic }}"
     backup_filename: "db_backup_{{ current_datetime }}.zip"
