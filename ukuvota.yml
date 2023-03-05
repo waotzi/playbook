@@ -1,7 +1,6 @@
 ---
 - name: Update and run Ukuvota
   hosts: localhost
-  gather_facts: false
 
   vars:
     github_user: "waotzi"
