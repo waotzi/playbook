@@ -4,17 +4,24 @@
   gather_facts: false
 
   vars:
-    artifact_url: "{{ extra_vars.artifact_url }}"
     backup_dir: "/root/backups/ukuvota"
     current_datetime: "{{ ansible_date_time.iso8601_basic }}"
     backup_filename: "db_backup_{{ current_datetime }}.zip"
 
   tasks:
-    - name: Download artifact from Github
-      get_url:
-        url: "{{ artifact_url }}"
-        dest: /tmp/ukuvota.zip
+    - name: Get the latest artifact from Github
+      command: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/waotzi/ukuvota/actions/artifacts | jq '.artifacts[0].id'"
+      register: artifact_id
 
+    - name: Download artifact from Github
+      command: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/waotzi/ukuvota/actions/artifacts/{{ artifact_id.stdout }} --jq=archive_download_url"
+      register: download_url
+
+    - name: Save the artifact to /tmp
+      get_url:
+        url: "{{ download_url.stdout | trim }}"
+        dest: /tmp/ukuvota.zip
+        
     - name: Backup database
       shell: "cd /var/www/ukuvota.world && zip -r {{ backup_dir }}/{{ backup_filename }} db"
       register: db_backup
