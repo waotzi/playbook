@@ -26,13 +26,19 @@
       register: db_backup
       when: backup_dir is defined
 
-    - name: Unzip artifact to /var/www/ukuvota.world
+    - name: Remove /dist folder
+      file:
+        path: /var/www/ukuvota.world/dist
+        state: absent
+      become: yes
+      when: db_backup.rc == 0
+      
+    - name: Unzip artifact to /var/www/ukuvota.world/dist
       unarchive:
         src: /tmp/ukuvota.zip
-        dest: /var/www/ukuvota.world
+        dest: /var/www/ukuvota.world/dist
         remote_src: yes
         extra_opts: [--overwrite]
-        force: true
       when: db_backup.rc == 0
 
     - name: Restart the application
