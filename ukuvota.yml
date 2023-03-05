@@ -14,8 +14,7 @@
       register: artifact_id
 
     - name: Get Archive Download URL
-      shell: curl -L "https://api.github.com/repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }}/zip" -o /tmp/ukuvota.zip
-      register: archive_url
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }}/zip > /tmp/ukuvota.zip"
 
     - name: Create backup directory if not exists
       file:
