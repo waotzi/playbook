@@ -16,12 +16,12 @@
       register: artifact_id
 
     - name: Get Archive Download URL
-      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }} jq=archive_download_url"
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }}/zip | jq -r '.url'"
       register: archive_url
 
     - name: Save the artifact to /tmp
       get_url:
-        url: "{{ archive_url.stdout | trim }}"
+        url: "{{ archive_url.stdout }}"
         dest: /tmp/ukuvota.zip
         
     - name: Backup database
