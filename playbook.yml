@@ -6,8 +6,7 @@
     playbook_repo_url: https://github.com/waotzi/playbook.git
     playbook_dest_path: /root/playbook
     webhook_secret_key_name: WEBHOOK_SECRET
-    webhook_dest_path: /etc/webhook.conf
-    webhook_file_path: ./webhook.conf
+    webhook_conf_path: /etc/webhook.conf
     env_file_path: .env
 
   tasks:
