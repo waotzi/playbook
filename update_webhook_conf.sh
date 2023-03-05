@@ -18,3 +18,7 @@ WEBHOOK_SECRET=$(grep '^WEBHOOK_SECRET=' "${ENV_FILE_PATH}" | cut -d '=' -f 2)
 
 # Replace mysecr3tC0d3 with WEBHOOK_KEY in hooks.yml
 sed -i "s/mysecr3tC0d3/${WEBHOOK_SECRET}/g" "${WEBHOOK_CONF_PATH}"
+
+# restart webhook process
+
+systemctl restart webhook
