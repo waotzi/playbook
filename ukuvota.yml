@@ -9,17 +9,17 @@
     backup_filename: "db_backup_{{ current_datetime }}.zip"
 
   tasks:
-    - name: Get the latest artifact from Github
-      command: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/waotzi/ukuvota/actions/artifacts | jq '.artifacts[0].id'"
+    - name: Get Artifact ID
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts | jq '.artifacts[0].id'"
       register: artifact_id
 
-    - name: Download artifact from Github
-      command: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/waotzi/ukuvota/actions/artifacts/{{ artifact_id.stdout }} --jq=archive_download_url"
-      register: download_url
+    - name: Get Archive Download URL
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }} --jq=archive_download_url"
+      register: archive_url
 
     - name: Save the artifact to /tmp
       get_url:
-        url: "{{ download_url.stdout | trim }}"
+        url: "{{ archive_url.stdout | trim }}"
         dest: /tmp/ukuvota.zip
         
     - name: Backup database
