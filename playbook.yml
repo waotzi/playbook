@@ -2,23 +2,47 @@
 - name: Update playbooks
   hosts: localhost
   gather_facts: false
+  vars:
+    playbook_repo_url: https://github.com/waotzi/playbook.git
+    playbook_dest_path: /root/playbook
+    webhook_secret_key_name: WEBHOOK_SECRET
+    webhook_dest_path: /etc/webhook.conf
+    webhook_file_path: ./webhook.conf
+    env_file_path: .env
 
   tasks:
-    - name: Check if the directory exists
+    - name: Check if the playbook directory exists
       stat:
-        path: /root/playbook
+        path: "{{ playbook_dest_path }}"
       register: dir_check
 
-    - name: Clone the repository if it doesn't exist
+    - name: Clone the playbook repository if it doesn't exist
       git:
-        repo: https://github.com/waotzi/playbook.git
-        dest: /root/playbook
+        repo: "{{ playbook_repo_url }}"
+        dest: "{{ playbook_dest_path }}"
         version: main
       when: not dir_check.stat.exists
+
 
     - name: Update the repository if it exists
       git:
         repo: https://github.com/waotzi/playbook.git
         dest: /root/playbook
         update: yes
-      when: dir_check.stat.exists
+      register: git_pull
+
+    - name: Replace the Webhook Configuration file with new configuration file
+      copy: 
+        src: ./webhook.conf
+        dest: "{{ webhook_conf_path }}"
+      when: git_pull.changed == True
+
+    - name: Get the value of WEBHOOK_SECRET environment variable from the .env file
+      shell: "cat /path/to/.env | grep 'WEBHOOK_SECRET' | cut -d '=' -f 2"
+      register: webhook_secret
+
+    - name: Update the webhook configuration with new secret
+      replace:
+        path: "{{ webhook_conf_path }}"
+        regexp: 'X-Hub-Signature:\s(.*)$'
+        replace: 'X-Hub-Signature: {{ webhook_secret.stdout }}'
