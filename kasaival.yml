@@ -1,0 +1,31 @@
+---
+- name: Update Kasaival
+  hosts: localhost
+
+  vars:
+    github_user: "waotzi"
+    github_repo: "kasaival"
+
+  tasks:
+    - name: Get Artifact ID
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts | jq '.artifacts[0].id'"
+      register: artifact_id
+
+    - name: Get Archive Download URL
+      shell: "gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' /repos/{{ github_user }}/{{ github_repo }}/actions/artifacts/{{ artifact_id.stdout }}/zip > /tmp/kasaival.zip"
+    
+    - name: Remove previous build if present
+      file:
+        path: /var/www/kasaival.rocks
+        state: absent
+      become: true
+
+    - name: Create a new directory if not present
+      file:
+        path: /var/www/kasaival.rocks
+        state: directory
+      become: true
+      
+    - name: Extract artifact
+      shell: "unzip -o /tmp/kasaival.zip -d /var/www/kasaival.rocks"
+
